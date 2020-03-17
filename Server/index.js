@@ -59,6 +59,7 @@ app.post('/login', function(req,res) {
  db.get(params, function(err, data) {
     if (err) {
         console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+	res.send({auth:false});
     } else {
         console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
 	console.log("Data:",data.Item.password);
@@ -70,5 +71,32 @@ app.post('/login', function(req,res) {
     }
  });
 
+});
+
+app.post('/register', function(req,res) {
+
+ const datos = req.body;
+ const username = datos.username;
+ const password = datos.password;
+// const url_photo = '';
+
+ let params = {
+	TableName: 'usuarios',
+	Item: {
+		'username': username,
+		'password': password
+		//'url_photo': url_photo
+	}
+ }
+
+ db.put(params, function(err,data) {
+	if(err){
+		console.error("No se ha podido insertar el elemento, Error JSON:",JSON.stringify(err,null,2));
+		res.send({register:false});
+	} else {
+		console.log("Dato insertado correctamente");
+		res.send({register:true});
+	}
+ });
 
 });
