@@ -169,7 +169,7 @@ app.post('/loadImage', upload.single('photo'), function(req,res) {
 	else{
 		var uploadParams = { Bucket: 'bucketfotos10/capturas', Key: '', Body: '' };
 		var file = './uploads/' + req.file.filename;
-
+		console.log("IMPORTANTE",req.file.filename);
 		var fileStream = fs.createReadStream(file);
     		fileStream.on("error", function (err) {
       			console.log("File Error", err);
@@ -197,31 +197,44 @@ app.post('/loadImage', upload.single('photo'), function(req,res) {
             					console.log("Error!");
 						res.send({auth: false});
             				}else {
+						var bandera = false;
             					data.Items.forEach(function(item) {
             						console.log(" -", item.username + ": " + item.url_photo);
+							if(item.url_photo!="null"){
+							var foto_captura = "capturas/"+req.file.filename;
+							console.log("nombre foto capturas:",foto_captura);
+							var  foto_usuario = "usuarios/"+item.url_photo.substring(58);
+							console.log("nombre foto usuarios:",foto_usuario);
+
 							var params = {
   								SimilarityThreshold: 90,
   									SourceImage: {
    										S3Object: {
-    											Bucket: "mybucket",
-    											Name: "mysourceimage"
+    											Bucket: "bucketfotos10",
+    											Name: foto_usuario
    										}
   									},
  									TargetImage: {
    										S3Object: {
-    											Bucket: "mybucket",
-    											Name: "mytargetimage"
+    											Bucket: "bucketfotos10",
+    											Name: foto_captura
    										}
   									}
  							};
 
  							rekognition.compareFaces(params, function(err, data) {
-
-								if (err) console.log(err, err.stack); // an error occurred
-   								else     console.log(data);           // successful response
+								console.log("-------------------------------------");
+								if (err) console.log("Error",err); // an error occurred
+   								else{
+									console.log("Exito",data);
+									bandera = true;
+									return;
+								}
         						});
-						}
-						res.send({auth: false});
+							}
+						});
+						console.log("valor retorno:",bandera);
+						res.send({auth: bandera});
             				}
 				});
 			}
