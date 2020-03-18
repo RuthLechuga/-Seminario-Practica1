@@ -20,6 +20,7 @@ app.use(function (req, res, next) {
 AWS.config.loadFromPath('./config.json');
 var db = new AWS.DynamoDB.DocumentClient();
 s3 = new AWS.S3({apiVersion: '2006-03-01'});
+var rekognition = new AWS.Rekognition({apiVersion: '2016-06-27'});
 
 const DIR = './uploads';
 
@@ -124,7 +125,7 @@ app.post('/register', upload.single('photo'), function(req,res) {
 						'url_photo': data.Location
 					}
 				 }
-				
+
 				 db.put(params, function(err,data) {
 					if(err){
 						console.error("No se ha podido insertar el elemento, Error JSON:",JSON.stringify(err,null,2));
@@ -146,7 +147,7 @@ app.post('/register', upload.single('photo'), function(req,res) {
 			'url_photo': 'null'
 		}
 	 }
-	
+
 	 db.put(params, function(err,data) {
 		if(err){
 			console.error("No se ha podido insertar el elemento, Error JSON:",JSON.stringify(err,null,2));
@@ -157,4 +158,52 @@ app.post('/register', upload.single('photo'), function(req,res) {
 		}
 	 });
  }
+});
+
+app.post('loadImage', upload.single('photo'), function(req,res) {
+
+	if(!req.file){
+		console.log("error!");
+		res.send({auth: false});
+	}
+	else{
+		var uploadParams = { Bucket: 'bucketfotos10/capturas', Key: '', Body: '' };
+		var file = './uploads/' + req.file.filename;
+
+		var fileStream = fs.createReadStream(file);
+    		fileStream.on("error", function (err) {
+      			console.log("File Error", err);
+			res.send({auth:false});
+		});
+
+    		uploadParams.Body = fileStream;
+
+		var path = require('path');
+   		uploadParams.Key = path.basename(file);
+
+    		s3.upload(uploadParams, function (err, data) {
+      			if (err) {
+        			console.log("Error", err);
+				res.send({auth:false});
+      			} if (data) {
+        			console.log("Upload Success", data.Location);
+				let scanningParameters = {
+            				TableName: 'usuarios',
+            				ScanIndexForward: false
+            			};
+
+               			db.scan(scanningParameters,function(err,data){
+            			if(err){
+            				console.log("Error!");
+					res.send({auth: false});
+            			}else {
+            				data.Items.forEach(function(item) {
+            					console.log(" -", item.username + ": " + item.url_photo);
+        				});
+					res.send({auth: false});
+            			}
+
+			}
+		});
+	}
 });
