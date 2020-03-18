@@ -160,7 +160,7 @@ app.post('/register', upload.single('photo'), function(req,res) {
  }
 });
 
-app.post('loadImage', upload.single('photo'), function(req,res) {
+app.post('/loadImage', upload.single('photo'), function(req,res) {
 
 	if(!req.file){
 		console.log("error!");
@@ -193,16 +193,37 @@ app.post('loadImage', upload.single('photo'), function(req,res) {
             			};
 
                			db.scan(scanningParameters,function(err,data){
-            			if(err){
-            				console.log("Error!");
-					res.send({auth: false});
-            			}else {
-            				data.Items.forEach(function(item) {
-            					console.log(" -", item.username + ": " + item.url_photo);
-        				});
-					res.send({auth: false});
-            			}
+            				if(err){
+            					console.log("Error!");
+						res.send({auth: false});
+            				}else {
+            					data.Items.forEach(function(item) {
+            						console.log(" -", item.username + ": " + item.url_photo);
+							var params = {
+  								SimilarityThreshold: 90,
+  									SourceImage: {
+   										S3Object: {
+    											Bucket: "mybucket",
+    											Name: "mysourceimage"
+   										}
+  									},
+ 									TargetImage: {
+   										S3Object: {
+    											Bucket: "mybucket",
+    											Name: "mytargetimage"
+   										}
+  									}
+ 							};
 
+ 							rekognition.compareFaces(params, function(err, data) {
+
+								if (err) console.log(err, err.stack); // an error occurred
+   								else     console.log(data);           // successful response
+        						});
+						}
+						res.send({auth: false});
+            				}
+				});
 			}
 		});
 	}
