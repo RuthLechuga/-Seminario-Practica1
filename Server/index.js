@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const async = require('async')
 let AWS = require('aws-sdk');
 
 app.use(bodyParser.json());
@@ -198,7 +199,7 @@ app.post('/loadImage', upload.single('photo'), function(req,res) {
 						res.send({auth: false});
             				}else {
 						var bandera = false;
-            					data.Items.forEach(function(item) {
+            					async.each(data.Items, function(item,callback) {
             						console.log(" -", item.username + ": " + item.url_photo);
 							if(item.url_photo!="null"){
 							var foto_captura = "capturas/"+req.file.filename;
@@ -224,17 +225,24 @@ app.post('/loadImage', upload.single('photo'), function(req,res) {
 
  							rekognition.compareFaces(params, function(err, data) {
 								console.log("-------------------------------------");
-								if (err) console.log("Error",err); // an error occurred
-   								else{
+								if (err){
+									console.log("Error",err);
+								 	callback('error');
+   								}else{
 									console.log("Exito",data);
 									bandera = true;
-									return;
+									callback(null,true);
 								}
         						});
 							}
+						}, function(err){
+							if(err){
+								 res.send({auth:bandera});
+							} else {
+								console.log("valor retorno:",bandera);
+								res.send({auth: bandera});
+							}
 						});
-						console.log("valor retorno:",bandera);
-						res.send({auth: bandera});
             				}
 				});
 			}
