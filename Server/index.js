@@ -94,9 +94,6 @@ app.post('/register', upload.single('photo'), function(req,res) {
  const datos = req.body;
  const username = datos.username;
  const password = datos.password;
- let url_photo = "null";
- console.log("username:",username);
- console.log("password:",password);
 
  if(req.file){
 	console.log(req.file.filename);
@@ -119,29 +116,45 @@ app.post('/register', upload.single('photo'), function(req,res) {
         		console.log("Error", err);
       		} if (data) {
         		console.log("Upload Success", data.Location);
-			url_photo = data.Location;
-			console.log("x1",url_photo);
+				let params = {
+					TableName: 'usuarios',
+					Item: {
+						'username': username,
+						'password': password,
+						'url_photo': data.Location
+					}
+				 }
+				
+				 db.put(params, function(err,data) {
+					if(err){
+						console.error("No se ha podido insertar el elemento, Error JSON:",JSON.stringify(err,null,2));
+						res.send({register:false});
+					} else {
+						console.log("Dato insertado correctamente");
+						res.send({register:true});
+					}
+				 });
       		}
     	});
  }
- console.log("x2:",url_photo);
-
- let params = {
-	TableName: 'usuarios',
-	Item: {
-		'username': username,
-		'password': password,
-		'url_photo': url_photo
-	}
+ else{
+	let params = {
+		TableName: 'usuarios',
+		Item: {
+			'username': username,
+			'password': password,
+			'url_photo': 'null'
+		}
+	 }
+	
+	 db.put(params, function(err,data) {
+		if(err){
+			console.error("No se ha podido insertar el elemento, Error JSON:",JSON.stringify(err,null,2));
+			res.send({register:false});
+		} else {
+			console.log("Dato insertado correctamente");
+			res.send({register:true});
+		}
+	 });
  }
-
- db.put(params, function(err,data) {
-	if(err){
-		console.error("No se ha podido insertar el elemento, Error JSON:",JSON.stringify(err,null,2));
-		res.send({register:false});
-	} else {
-		console.log("Dato insertado correctamente");
-		res.send({register:true});
-	}
- });
 });
