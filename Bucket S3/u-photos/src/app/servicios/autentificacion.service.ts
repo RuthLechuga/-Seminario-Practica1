@@ -45,4 +45,17 @@ export class AutentificacionService {
     });
   }
 
+  login_photo(photo){
+    var formData: any = new FormData();
+    formData.append("photo", photo);
+
+    const url = `${this.url_api}/loadImage`;
+    return new Promise(resolve => {
+      this.httpClient.post(url,formData)
+      .subscribe(resp => {
+        resolve(resp["auth"]);
+      });
+    });
+  }
+
 }

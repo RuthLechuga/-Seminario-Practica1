@@ -14,7 +14,6 @@ export class LoginComponent implements OnInit {
 
   user_register: string = '';
   password_register: string = '';
-  passwordc_register: string = '';
 
   videoWidth = 0;
   videoHeight = 0;
@@ -58,17 +57,13 @@ export class LoginComponent implements OnInit {
     this.password_register = event.target.value;
   }
 
-  onKeyPasswordcRegister(event){
-    this.passwordc_register = event.target.value;
-  }
-
   //---------------------------------------------------FUNCIONES---------------------------------------------//
   async login(){
     const bandera = await this.authService.login(this.username,this.password);
     console.log(bandera);
 
     if(bandera){
-      this.router.navigate(['/','home']);  
+      this.router.navigate(['/','home/fotos']);  
     }
     else
     {
@@ -77,11 +72,6 @@ export class LoginComponent implements OnInit {
   }
 
   async register(){
-    if(this.password_register.localeCompare(this.passwordc_register)!=0){
-      alert("Las contraseñas no coinciden. Intente nuevamente.")
-      return;
-    }
-
     var bytes = this.url_photo.split(',')[0].indexOf('base64') >= 0 ?
           atob(this.url_photo.split(',')[1]) :
           (<any>window).unescape(this.url_photo.split(',')[1]);
@@ -92,13 +82,12 @@ export class LoginComponent implements OnInit {
       ia[i] = bytes.charCodeAt(i);
     }
 
-    //var blob = new Blob([this.url_photo], {type: 'image/jpg'});
     var file = new File([ia], this.user_register+'.jpg', { type: mime });
     const bandera = await this.authService.register(this.user_register,this.password_register,file);
     
     if(bandera){
       alert("Registro realizado de forma exitosa.")
-      this.router.navigate(['/','home']);  
+      this.router.navigate(['/','home/fotos']);  
     }
     else
     {
@@ -137,15 +126,36 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  capture(){
+  async capture(){
     this.renderer.setProperty(this.canvas.nativeElement, 'width', this.videoWidth);
     this.renderer.setProperty(this.canvas.nativeElement, 'height', this.videoHeight);
     this.canvas.nativeElement.getContext('2d').drawImage(this.videoElement.nativeElement, 0, 0);
     this.url_photo = this.canvas.nativeElement.toDataURL("image/png");
     console.log(this.url_photo);
+
+    var bytes = this.url_photo.split(',')[0].indexOf('base64') >= 0 ?
+          atob(this.url_photo.split(',')[1]) :
+          (<any>window).unescape(this.url_photo.split(',')[1]);
+    
+    var mime = this.url_photo.split(',')[0].split(':')[1].split(';')[0];
+    var max = bytes.length;
+    var ia = new Uint8Array(max);
+    for (var i = 0; i < max; i++) {
+      ia[i] = bytes.charCodeAt(i);
+    }
+
+    var file = new File([ia], 'image.jpg', { type: mime });
+    const bandera = await this.authService.login_photo(file);
+
+    if(bandera){
+      this.router.navigate(['/','home']);  
+    }
+    else{
+      alert("Datos ingresados incorrectos!");
+    }
   }
 
-  captureRegister(){
+  async captureRegister(){
     this.renderer.setProperty(this.canvas.nativeElement, 'width', this.videoWidth);
     this.renderer.setProperty(this.canvas.nativeElement, 'height', this.videoHeight);
     this.canvas.nativeElement.getContext('2d').drawImage(this.videoRegister.nativeElement, 0, 0);

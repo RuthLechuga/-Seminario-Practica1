@@ -8,6 +8,9 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { HomeComponent } from './components/home/home.component';
+import { HomeFotosComponent } from './components/home-fotos/home-fotos.component';
+import { HomeAlbumsComponent } from './components/home-albums/home-albums.component';
+import { HomeMisFotosComponent } from './components/home-mis-fotos/home-mis-fotos.component';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
@@ -18,7 +21,10 @@ const appRoutes: Routes = [
   declarations: [
     AppComponent,
     LoginComponent,
-    HomeComponent
+    HomeComponent,
+    HomeFotosComponent,
+    HomeAlbumsComponent,
+    HomeMisFotosComponent
   ],
   imports: [
     BrowserModule,
