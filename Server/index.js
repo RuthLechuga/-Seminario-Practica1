@@ -79,13 +79,17 @@ app.post('/login', function(req,res) {
         console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
 	res.send({auth:false});
     } else {
-        console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
-	console.log("Data:",data.Item.password);
-	if(data.Item.password.localeCompare(password)==0)
-		res.send({auth: true});
-	else
-		res.send({auth: false});
-
+	if(JSON.stringify(data,null,2).localeCompare("{}")==0){
+		res.send({auth:false});
+	}
+	else{
+	        console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+		console.log("Data:",data.Item.password);
+		if(data.Item.password.localeCompare(password)==0)
+			res.send({auth: true});
+		else
+			res.send({auth: false});
+	}
     }
  });
 
@@ -161,7 +165,7 @@ app.post('/register', upload.single('photo'), function(req,res) {
  }
 });
 
-app.post('/loadImage', upload.single('photo'), function(req,res) {
+app.post('/loginLoadImage', upload.single('photo'), function(req,res) {
 
 	if(!req.file){
 		console.log("error!");
@@ -199,6 +203,8 @@ app.post('/loadImage', upload.single('photo'), function(req,res) {
 						res.send({auth: false});
             				}else {
 						var bandera = false;
+						var username = "";
+
             					async.each(data.Items, function(item,callback) {
             						console.log(" -", item.username + ": " + item.url_photo);
 							if(item.url_photo!="null"){
@@ -227,20 +233,20 @@ app.post('/loadImage', upload.single('photo'), function(req,res) {
 								console.log("-------------------------------------");
 								if (err){
 									console.log("Error",err);
-								 	callback('error');
+									callback("Error",null);
    								}else{
 									console.log("Exito",data);
 									bandera = true;
-									callback(null,true);
+									username = item.username;
+									callback(null,"Exito");
 								}
         						});
 							}
-						}, function(err){
-							if(err){
-								 res.send({auth:bandera});
+						}, function(err,result){
+							if(!bandera){
+								 res.send({auth:false, username: ""});
 							} else {
-								console.log("valor retorno:",bandera);
-								res.send({auth: bandera});
+								res.send({auth:true, username: username });
 							}
 						});
             				}
@@ -249,3 +255,54 @@ app.post('/loadImage', upload.single('photo'), function(req,res) {
 		});
 	}
 });
+
+
+app.post('/loadImage', upload.single('photo'), function(req,res) {
+	 const datos = req.body;
+	 const username = datos.username;
+
+	if(!req.file){
+		console.log("error!");
+		res.send({loadImage: false, informacion: "La imagen no se ha podido cargar exitosamente."});
+	}
+	else{
+		var uploadParams = { Bucket: 'bucketfotos10/fotos', Key: '', Body: '' };
+		var file = './uploads/' + req.file.filename;
+
+	        var fileStream = fs.createReadStream(file);
+    		fileStream.on("error", function (err) {
+      			console.log("File Error", err);
+			res.send({auth:false});
+		});
+
+    		uploadParams.Body = fileStream;
+
+		var path = require('path');
+   		uploadParams.Key = path.basename(file);
+
+	    	s3.upload(uploadParams, function (err, data) {
+      			if (err) {
+        			console.log("Error", err);
+                		res.send({auth:false});
+            		} if (data) {
+                		console.log("Upload Success", data.Location);
+                		var params = {
+                    			TableName:'fotos',
+                    			Item:{
+                        			"username": username,
+                        			"nombre_foto": data.Location
+                    			}
+                		};
+
+                		db.put(params, function(err, data) {
+                    			if (err) {
+                        			res.send({loadImage: false, informacion: "La imagen no se ha podido cargar exitosamente."});
+                    			} else {
+                        			res.send({loadImage: truee, informacion: "Imagen subida exitosamente."});
+                    			}
+                		});
+			}
+		});
+	}
+});
+
