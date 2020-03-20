@@ -1,4 +1,7 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
 <nav class="navbar bg-primary navbar-dark justify-content-between fixed-top">
 
@@ -6,9 +9,11 @@
         <img src="../../../assets/camera.svg" width="30" height="30" class="d-inline-block align-top" alt="">
         U-photos
     </a>
-    <form class="form-inline my-2 my-lg-0" action="/action_page.php">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search">
-      <button class="btn btn-dark" type="submit">Subir foto</button>
+    <form class="form-inline my-2 my-lg-0">
+        <div class="custom-file">
+            <label class="custom-file-label" for="customFile" style="background-color:rgb(193,32,32); color: blanchedalmond;">Subir foto</label>
+            <input #file type="file" class="custom-file-input" id="customFile" accept='image/*' (change)="loadPhoto(file.files)">
+        </div>
     </form>
 </nav>
 
@@ -18,7 +23,7 @@
         <ul class="sidebar-nav">
             <li class="sidebar-brand">
                 <a href="/home/fotos">
-                    Nombre Usuario
+                    {{username}}
                 </a>
             </li>
             <li>
@@ -46,5 +51,6 @@
         </div>
     </div>
 </div>
+
 
   

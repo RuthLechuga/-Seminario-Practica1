@@ -49,13 +49,30 @@ export class AutentificacionService {
     var formData: any = new FormData();
     formData.append("photo", photo);
 
+    const url = `${this.url_api}/loginLoadImage`;
+    return new Promise(resolve => {
+      this.httpClient.post(url,formData)
+      .subscribe(resp => {
+        console.log(resp);
+        resolve(resp);
+      });
+    });
+  }
+
+  load_photo(photo,username){
+    var formData: any = new FormData();
+    formData.append("photo", photo);
+    formData.append("username", username);
+    console.log("datos:",formData);
+
     const url = `${this.url_api}/loadImage`;
     return new Promise(resolve => {
       this.httpClient.post(url,formData)
       .subscribe(resp => {
-        resolve(resp["auth"]);
+        resolve(resp);
       });
     });
   }
+
 
 }

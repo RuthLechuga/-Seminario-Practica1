@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { AutentificacionService } from 'src/app/servicios/autentificacion.service';
 import { Router } from '@angular/router';
+import { UsuarioService } from 'src/app/servicios/usuario.service';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -34,7 +36,8 @@ export class LoginComponent implements OnInit {
 
   constructor(public authService: AutentificacionService,
               private router: Router,
-              private renderer: Renderer2) { }
+              private renderer: Renderer2,
+              private userService: UsuarioService) { }
     
   ngOnInit(): void {
     this.startCamera();
@@ -43,6 +46,7 @@ export class LoginComponent implements OnInit {
   //-------------------------------------------------OBTENER DATOS-------------------------------------------//
   onKeyPassLogin(event){
     this.password = event.target.value;
+    console.log(this.password);
   }
 
   onKeyUserLogin(event){
@@ -63,7 +67,9 @@ export class LoginComponent implements OnInit {
     console.log(bandera);
 
     if(bandera){
-      this.router.navigate(['/','home/fotos']);  
+      let u: User = {username: this.username};        
+      this.userService.setUserLoggedIn(u);
+      this.router.navigate(['/','home']);  
     }
     else
     {
@@ -87,7 +93,9 @@ export class LoginComponent implements OnInit {
     
     if(bandera){
       alert("Registro realizado de forma exitosa.")
-      this.router.navigate(['/','home/fotos']);  
+      let u: User = {username: this.username};        
+      this.userService.setUserLoggedIn(u);
+      this.router.navigate(['/','home']);  
     }
     else
     {
@@ -126,6 +134,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  //loguearse por camara
   async capture(){
     this.renderer.setProperty(this.canvas.nativeElement, 'width', this.videoWidth);
     this.renderer.setProperty(this.canvas.nativeElement, 'height', this.videoHeight);
@@ -145,9 +154,12 @@ export class LoginComponent implements OnInit {
     }
 
     var file = new File([ia], 'image.jpg', { type: mime });
-    const bandera = await this.authService.login_photo(file);
+    const datos = await this.authService.login_photo(file);
+    console.log(datos);
 
-    if(bandera){
+    if(datos["auth"]){
+      let u: User = {username: datos["username"]};        
+      this.userService.setUserLoggedIn(u);
       this.router.navigate(['/','home']);  
     }
     else{
