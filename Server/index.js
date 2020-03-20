@@ -258,8 +258,8 @@ app.post('/loginLoadImage', upload.single('photo'), function(req,res) {
 
 
 app.post('/loadImage', upload.single('photo'), function(req,res) {
-	 const datos = req.body;
-	 const username = datos.username;
+	const datos = req.body;
+	const username = datos.username;
 
 	if(!req.file){
 		console.log("error!");
@@ -298,7 +298,7 @@ app.post('/loadImage', upload.single('photo'), function(req,res) {
                     			if (err) {
                         			res.send({loadImage: false, informacion: "La imagen no se ha podido cargar exitosamente."});
                     			} else {
-                        			res.send({loadImage: truee, informacion: "Imagen subida exitosamente."});
+                        			res.send({loadImage: true, informacion: "Imagen subida exitosamente."});
                     			}
                 		});
 			}
