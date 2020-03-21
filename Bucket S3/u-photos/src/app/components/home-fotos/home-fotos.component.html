@@ -1,9 +1,9 @@
-<h1>Fotos</h1>
-
+<h3>Fotos</h3>
+<br>
 
 <div class="row">
-    <div class="col-sm-3" *ngFor="let item of photos">
-        <div class="card border-info mb-3" style="max-width: 15rem; height:250px">
+    <div class="col-sm-4" *ngFor="let item of photos">
+        <div class="card border-info mb-3" style="height:250px; width: 350px;">
             <div class="card-header">{{item.nombre_foto.substring(55)}}</div>
             <div class="card-body text-info text-center">
                 <img src="{{item.nombre_foto}}" height="100%">

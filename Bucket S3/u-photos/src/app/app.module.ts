@@ -11,9 +11,12 @@ import { HomeComponent } from './components/home/home.component';
 import { HomeFotosComponent } from './components/home-fotos/home-fotos.component';
 import { HomeAlbumsComponent } from './components/home-albums/home-albums.component';
 import { HomeMisFotosComponent } from './components/home-mis-fotos/home-mis-fotos.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatTabsModule } from '@angular/material/tabs';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
+  { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent },
 ];
 
@@ -31,10 +34,12 @@ const appRoutes: Routes = [
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+    MatTabsModule,
     RouterModule.forRoot(
       appRoutes,
       { enableTracing: true } // <-- debugging purposes only
-    )
+    ),
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

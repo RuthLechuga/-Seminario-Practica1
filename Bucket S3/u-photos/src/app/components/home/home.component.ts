@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UsuarioService } from 'src/app/servicios/usuario.service';
 import { User } from 'src/app/models/user.model';
-import { LambdasService } from 'src/app/servicios/lambdas.service';
 import { AutentificacionService } from 'src/app/servicios/autentificacion.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
@@ -60,10 +60,11 @@ export class HomeComponent implements OnInit {
     console.log(datos);
 
     if(datos["loadImage"]){
-      alert(datos["informacion"]);
+      Swal.fire(datos["informacion"]).then((result)=> {if(result.value) window.location.reload();})
+
     }
     else{
-      alert("La foto no se ha podido cargar correctamente");
+      Swal.fire("La foto no se ha podido cargar correctamente");
     }
 
   }

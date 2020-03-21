@@ -45,6 +45,22 @@ export class AutentificacionService {
     });
   }
 
+  register_nophoto(username, password){
+    //const data = {username, password}
+    var formData: any = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
+    console.log("datos:",formData);
+
+    const url = `${this.url_api}/register`;
+    return new Promise(resolve => {
+      this.httpClient.post(url,formData)
+      .subscribe(resp => {
+        resolve(resp["register"]);
+      });
+    });
+  }
+
   login_photo(photo){
     var formData: any = new FormData();
     formData.append("photo", photo);

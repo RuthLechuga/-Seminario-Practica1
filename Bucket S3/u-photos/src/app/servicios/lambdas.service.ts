@@ -20,4 +20,28 @@ export class LambdasService {
       });
     });
   }
+
+  getMyPhotos(username){
+    const data = {username}
+    const url = `${this.url_api}/myphotos`;
+    return new Promise(resolve => {
+      this.httpClient.post(url,data)
+      .subscribe(resp => {
+        console.log(resp);
+        resolve(resp);
+      });
+    });
+  }
+
+  getPhotosCategory(username){
+    const data = {username}
+    const url = `${this.url_api}/getphotoscategory`;
+    return new Promise(resolve => {
+      this.httpClient.post(url,data)
+      .subscribe(resp => {
+        console.log(resp);
+        resolve(resp);
+      });
+    });
+  }
 }

@@ -3,6 +3,7 @@ import { AutentificacionService } from 'src/app/servicios/autentificacion.servic
 import { Router } from '@angular/router';
 import { UsuarioService } from 'src/app/servicios/usuario.service';
 import { User } from '../../models/user.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -78,30 +79,86 @@ export class LoginComponent implements OnInit {
   }
 
   async register(){
-    var bytes = this.url_photo.split(',')[0].indexOf('base64') >= 0 ?
-          atob(this.url_photo.split(',')[1]) :
-          (<any>window).unescape(this.url_photo.split(',')[1]);
-    var mime = this.url_photo.split(',')[0].split(':')[1].split(';')[0];
-    var max = bytes.length;
-    var ia = new Uint8Array(max);
-    for (var i = 0; i < max; i++) {
-      ia[i] = bytes.charCodeAt(i);
+    if(this.url_photo != "" && this.user_register!= "" && this.password_register!=""){
+      var bytes = this.url_photo.split(',')[0].indexOf('base64') >= 0 ?
+      atob(this.url_photo.split(',')[1]) :
+      (<any>window).unescape(this.url_photo.split(',')[1]);
+      var mime = this.url_photo.split(',')[0].split(':')[1].split(';')[0];
+      var max = bytes.length;
+      var ia = new Uint8Array(max);
+      for (var i = 0; i < max; i++) {
+        ia[i] = bytes.charCodeAt(i);
+      }
+
+      Swal.fire({
+        title: '¿Quieres registrarte con estos datos?',
+        text: "Username: "+this.user_register,
+        imageUrl: this.url_photo,
+        imageWidth: 400,
+        imageHeight: 200,
+        imageAlt: 'Custom image',    
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Loguin'
+      }).then((result) => {
+        if (result.value) {
+          Swal.fire({title: "Espera mientras procesamos la información...", text: "Puede tardar algunos segundos"});
+          this.register_photo(ia,mime);
+        }
+      })
+    }
+    else if(this.user_register!= "" && this.password_register!=""){
+      Swal.fire({
+        title: '¿Quieres registrarte con estos datos?',
+        text: "Username: "+this.user_register,
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Loguin'
+      }).then((result) => {
+        if (result.value) {
+          Swal.fire({title: "Espera mientras procesamos la información...", text: "Puede tardar algunos segundos"});
+          this.register_nophoto();
+        }
+      })
     }
 
+    else
+      Swal.fire("Datos insuficientes para registrarse!");
+  }
+
+  async register_photo(ia,mime){
     var file = new File([ia], this.user_register+'.jpg', { type: mime });
     const bandera = await this.authService.register(this.user_register,this.password_register,file);
-    
+
     if(bandera){
-      alert("Registro realizado de forma exitosa.")
-      let u: User = {username: this.username};        
+      Swal.fire("Registro realizado de forma exitosa.")
+      let u: User = {username: this.user_register};        
       this.userService.setUserLoggedIn(u);
       this.router.navigate(['/','home']);  
     }
     else
     {
-      alert("Datos ingresados incorrectos!");
+      Swal.fire("Datos ingresados incorrectos!");
     }
   }
+
+  async register_nophoto(){
+    const bandera = await this.authService.register_nophoto(this.user_register,this.password_register);
+
+    if(bandera){
+      Swal.fire("Registro realizado de forma exitosa.")
+      let u: User = {username: this.user_register};        
+      this.userService.setUserLoggedIn(u);
+      this.router.navigate(['/','home']);  
+    }
+    else
+    {
+      Swal.fire("Datos ingresados incorrectos!");
+    }
+  }
+
 
   //---------------------------------------------------CAMARA---------------------------------------------//
   startCamera() {
@@ -153,6 +210,25 @@ export class LoginComponent implements OnInit {
       ia[i] = bytes.charCodeAt(i);
     }
 
+    Swal.fire({
+      title: '¿Quieres loguarte con esta imagen?',
+      imageUrl: this.url_photo,
+      imageWidth: 400,
+      imageHeight: 200,
+      imageAlt: 'Custom image',    
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Loguin'
+    }).then((result) => {
+      if (result.value) {
+        Swal.fire({title: "Espera mientras procesamos la información...", text: "Puede tardar algunos segundos"});
+        this.login_image(ia,mime);
+      }
+    })
+  }
+
+  async login_image(ia,mime){
     var file = new File([ia], 'image.jpg', { type: mime });
     const datos = await this.authService.login_photo(file);
     console.log(datos);
@@ -163,7 +239,7 @@ export class LoginComponent implements OnInit {
       this.router.navigate(['/','home']);  
     }
     else{
-      alert("Datos ingresados incorrectos!");
+      Swal.fire("Datos ingresados incorrectos!");
     }
   }
 
@@ -173,6 +249,16 @@ export class LoginComponent implements OnInit {
     this.canvas.nativeElement.getContext('2d').drawImage(this.videoRegister.nativeElement, 0, 0);
     this.url_photo = this.canvas.nativeElement.toDataURL("image/png");
     console.log(this.url_photo);
+
+    Swal.fire({
+      title: 'Foto almacenada',
+      imageUrl: this.url_photo,
+      imageWidth: 400,
+      imageHeight: 200,
+      imageAlt: 'Custom image',    
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Aceptar'
+    });
   }
 
 }

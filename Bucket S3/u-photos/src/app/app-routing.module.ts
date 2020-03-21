@@ -19,6 +19,18 @@ const routes: Routes = [
       {path: 'misFotos', component: HomeMisFotosComponent}
     ] 
   },
+  {
+    path: 'home/fotos',
+    component: HomeFotosComponent
+  },
+  {
+    path: 'home/albums',
+    component: HomeAlbumsComponent
+  },
+  {
+    path: 'home/misFotos',
+    component: HomeMisFotosComponent
+  }
 ];
 
 @NgModule({
