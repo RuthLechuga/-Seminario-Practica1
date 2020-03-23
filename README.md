@@ -12,26 +12,33 @@ Para la autenticación habrán dos formas de realizarlo:
 - **Ingresando un nombre de usuario y contraseña**
 - **Reconocimiento facial (utilizando la cámara del dispositivo)**
 
-##ÁREA DE REGISTRO DE USUARIO
+## ÁREA DE REGISTRO DE USUARIO
 Para registrar un nuevo usuario obligatoriamente se pedirán los datos
 - **Usuario**
 - **Contraseña** 
 - **Confirmar contraseña** 
 La parte de capturar foto será opcional para el usuario de la aplicación, dependiendo si desea utilizar el reconocimiento facial.
 
-##PÁGINA PRINCIPAL 
+## PÁGINA PRINCIPAL 
 Fotos: Sección de la página principal donde se listarán todas las fotos subidas, además, se tendrá la opción de subir una foto almacenada en la computadora
 
-##ÁLBUMES
+## ÁLBUMES
 En esta sección se mostrarán todas las fotos subidas de forma categorizadas, cada foto sólo pertenece a una categoría o álbum.
 
 Fotos en las que apareces
 Basado en la foto de perfil subida en el registro del usuario, se mostrarán las fotos subidas que coincidan (según el porcentaje de similitud definido por el estudiante) con la foto de perfil.
 
 
+## SERVER
 
+#### Sitio web
+En esta arquitectura se tendrá un bucket de S3 que empiece con el nombre de BucketSitioWeb_10, en este se tendrá la página web con el que el usuario estará interactuando, utilizando la función de alojamiento de sitio web estático de S3.
 
+#### Registro de un nuevo usuario
+Cuando el usuario se registre, los datos ingresados se enviarán hacia la API para que las almacene el registro (nombre usuario y contraseña) en una tabla de DynamoDB, el nombre de la tabla es "usuarios". Si en el registro también se incluye la foto de perfil, la API se encargará de guardar esta foto en una carpeta dentro de un bucket de S3, el bucket tendrá un nombre que empiece con “BucketFotos_10” y la carpeta se llama “usuarios” . La dirección
+web de la foto de perfil también se almacenará en la tabla de DynamoDB.
 
+## SERVERLESS
 
 ## Sobre Amazon Web Service
 Amazon Web Service es la empresa pionera en el paradigma “Infrastructure As A Service” por lo que dispone de una alta gama de servicios a precios bastante competentes para que cualquiera con conocimientos medios en programación sea capaz de levantar un data center en unos sencillos pasos.
@@ -59,21 +66,24 @@ Amazon Rekognition facilita la incorporación del análisis de imágenes y video
 Con AWS Identity and Access Management (IAM) puede administrar el acceso a los servicios y recursos de AWS de manera segura. Además, puede crear y administrar usuarios y grupos de AWS, así como utilizar permisos para conceder o negar el acceso de estos a los recursos de AWS.
 
 ##### IAM Usuarios Implementados
-**Administrador_201503984**: Usuario creado para trabajar en la práctica, usando la política de administrador que proporciona aws.
+- **Administrador_201503984**: Usuario creado para trabajar en la práctica, usando la política de administrador que proporciona aws.
 
 ##### Roles Utilizados
-**DynamoDB-W-FULL**: Rol creado para la base de datos no SQL, para este rol utlizamos la política AmazonDynamoDBFullAccess y creamos una política llamada dynamodb-write-item, la cual tiene permisos de escritura a la base de datos. 
-**lambda_basic_execution**: Rol creado para usar rekognition, el cual lo utilizamos en una función lambda, utilizando la política AmazonRekognitionFullAccess.
+- **DynamoDB-W-FULL**: Rol creado para la base de datos no SQL, para este rol utlizamos la política AmazonDynamoDBFullAccess y creamos una política llamada dynamodb-write-item, la cual tiene permisos de escritura a la base de datos. 
+- **lambda_basic_execution**: Rol creado para usar rekognition, el cual lo utilizamos en una función lambda, utilizando la política AmazonRekognitionFullAccess.
 
 ##### Funciones Lambda
-**getMyPhotos**: En esta funcion lambda se le envia como parametro de entrada el nombre del usuario, y devuelve la direccion url de la imagen que
+
+- **getMyPhotos**: En esta funcion lambda se le envia como parametro de entrada el nombre del usuario, y devuelve la direccion url de la imagen que
 proporciona como resultado de la busqueda de todas las fotos donde aparece. 
-**getPhotosCategory**: En esta funcion lambda se le envia como parametro de entrada el nombre del usuario, y devuelve la categoria a la que pertenece
+
+- **getPhotosCategory**: En esta funcion lambda se le envia como parametro de entrada el nombre del usuario, y devuelve la categoria a la que pertenece
 la imagen evaluada y la direccion url de la imagen. Esta respuesta es proporciona como resultado de la busqueda de todas las fotos que ha subido a la
-plataforma el usuario. 
-**getAllPhotos**: En esta funcion lambda se le envia como parametro de entrada el nombre del usuario, y devuelve la direccion url de la imagen que
+plataforma el usuario.
+
+- **getAllPhotos**: En esta funcion lambda se le envia como parametro de entrada el nombre del usuario, y devuelve la direccion url de la imagen que
 proporciona como resultado la busqueda de todas las fotos que ha subido el usuario a la plataforma. 
 
 ## Autores
-# **201503984** Fernando Vidal Ruíz Piox
-# **201602975** Ruth Nohemy Ardón Lechuga
+#### **201503984** Fernando Vidal Ruíz Piox
+#### **201602975** Ruth Nohemy Ardón Lechuga
