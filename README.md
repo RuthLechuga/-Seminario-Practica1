@@ -50,7 +50,8 @@ cual retornará
 En esta arquitectura se definirán las funcionalidades principales de la aplicación. El usuario utilizara el mismo sitio web anteriormente descrito (
 alojado en el bucket S3), la cual se comunicará con una API Gateway que estará vinculada a varias funciones lambda con las funcionalidades del sitioweb:
 
-- **Listar Fotos(Fotos)**: 
+- **Listar Fotos(Fotos)**: Para el caso de listar todas las fotos subidas, relacionada con la sección “Fotos” del sitio web, se utilizará una función
+lambda que obtendrá todas las direcciones (url de S3) almacenadas en la tabla de DynamoDB correspondiente.
 - **Listar Fotos por Categoria(Álbumes)**: Relacionada con la sección “Álbumes” del sitio web, una función lambda obtendrá las direcciones web de las
 fotos almacenada en la tabla de DynamoDB correscopiende, y la información (categoría) de cada foto se obtendrá utilizando la API de Rekognition.
 - **Listar Fotos en la que Aparezco**: Relacionada con la sección del mismo nombre “Listar fotos en las que apareces”, una función lambda obtendrá la
