@@ -28,7 +28,6 @@ En esta sección se mostrarán todas las fotos subidas de forma categorizadas, c
 Fotos en las que apareces
 Basado en la foto de perfil subida en el registro del usuario, se mostrarán las fotos subidas que coincidan (según el porcentaje de similitud definido por el estudiante) con la foto de perfil.
 
-
 ## SERVER
 
 #### Sitio web
@@ -38,7 +37,26 @@ En esta arquitectura se tendrá un bucket de S3 que empiece con el nombre de Buc
 Cuando el usuario se registre, los datos ingresados se enviarán hacia la API para que las almacene el registro (nombre usuario y contraseña) en una tabla de DynamoDB, el nombre de la tabla es "usuarios". Si en el registro también se incluye la foto de perfil, la API se encargará de guardar esta foto en una carpeta dentro de un bucket de S3, el bucket tendrá un nombre que empiece con “BucketFotos_10” y la carpeta se llama “usuarios” . La dirección
 web de la foto de perfil también se almacenará en la tabla de DynamoDB.
 
+#### Login
+Existen 2 opciones de autenticación:
+- **Uso de credenciales**: si solo se ingresan nombre y contraseña, se enviarán estos datos a la API para que verifique que coincida con el registro en
+la tabla de DynamoDB anteriormente descrita.
+- **Reconocimiento facial**: si se realiza un captura por medio de la cámara del dispositivo, la foto codificada (base64 u otro) se enviará a la API
+para que compare esta con la foto de perfil del usuario que está almacenada en S3. Para que sea posible la comparación de rostros, la foto capturada
+debe de ser almacenada en S3, en el mismo bucket “BucketFotos_10” y en una carpeta llamada “capturas”. Para el proceso de reconocimiento facial, se deberá de utilizar la API del servicio Amazon Rekognition, mediante la API de este servicio se utilizará la función de comparar rostros, el
+cual retornará
+
 ## SERVERLESS
+En esta arquitectura se definirán las funcionalidades principales de la aplicación. El usuario utilizara el mismo sitio web anteriormente descrito (
+alojado en el bucket S3), la cual se comunicará con una API Gateway que estará vinculada a varias funciones lambda con las funcionalidades del sitioweb:
+
+- **Listar Fotos(Fotos)**: 
+- **Listar Fotos por Categoria(Álbumes)**: Relacionada con la sección “Álbumes” del sitio web, una función lambda obtendrá las direcciones web de las
+fotos almacenada en la tabla de DynamoDB correscopiende, y la información (categoría) de cada foto se obtendrá utilizando la API de Rekognition.
+- **Listar Fotos en la que Aparezco**: Relacionada con la sección del mismo nombre “Listar fotos en las que apareces”, una función lambda obtendrá la
+dirección web de la foto de perfil de usuario y hará la comparación con las fotos que el usuario ha subido, utilizando la API de Rekognition (este 
+utiliza las direcciones web S3 de las fotos que se van a comparar), según el porcentaje de similitud definido, la API Rekognition retornará si la foto
+de perfil coincide con cada foto, las que coincidan son las que se mostrarán en el sitio web.
 
 ## Sobre Amazon Web Service
 Amazon Web Service es la empresa pionera en el paradigma “Infrastructure As A Service” por lo que dispone de una alta gama de servicios a precios bastante competentes para que cualquiera con conocimientos medios en programación sea capaz de levantar un data center en unos sencillos pasos.
